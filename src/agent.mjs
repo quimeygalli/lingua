@@ -254,7 +254,8 @@ const GREET_PROMPT =
 
   "Si primeraVez es true (nunca ha usado la app): " +
   "Saludalo brevemente en espanol (1-2 oraciones) y dile que le haras un test rapido de texto para conocer su nivel real. " +
-  "Luego haz exactamente 5 preguntas EN INGLES, UNA POR VEZ — espera su respuesta antes de continuar: " +
+  "Luego haz exactamente 5 preguntas EN INGLES, UNA POR VEZ — espera su respuesta antes de continuar. " +
+  "Antes de cada pregunta escribe en espanol: 'Pregunta X de 5:' (donde X es el numero actual). " +
   "P1: 'What is your name and where are you from?' (nivel A1) " +
   "P2: 'Describe your daily routine using at least 3 sentences.' (nivel A2) " +
   "P3: 'Tell me about something interesting you did last year.' (nivel B1) " +
