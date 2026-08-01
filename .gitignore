@@ -1,0 +1,5 @@
+.aws-sam/
+.claude/
+node_modules/
+*.zip
+CLAUDE.md
