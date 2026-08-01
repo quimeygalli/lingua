@@ -26,55 +26,6 @@ export const CHAT_HTML = `<!DOCTYPE html>
     display: flex;
     flex-direction: column;
   }
-
-  /* ── Start screen ── */
-  #start-screen {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 28px;
-    padding: 40px 24px;
-    text-align: center;
-  }
-  #start-screen .logo { font-size: 64px; line-height: 1; }
-  #start-screen h1 { font-size: 32px; font-weight: 800; color: var(--accent); letter-spacing: -0.5px; }
-  #start-screen p { font-size: 16px; color: var(--dim); max-width: 340px; line-height: 1.6; }
-  #start-screen .badge {
-    display: flex;
-    gap: 12px;
-    flex-wrap: wrap;
-    justify-content: center;
-  }
-  #start-screen .badge span {
-    background: var(--panel);
-    border: 1px solid var(--border);
-    border-radius: 20px;
-    padding: 5px 14px;
-    font-size: 13px;
-    color: var(--accent);
-    font-weight: 600;
-  }
-  #btn-start {
-    background: linear-gradient(135deg, var(--accent), var(--accent2));
-    color: #fff;
-    border: none;
-    border-radius: 16px;
-    padding: 18px 48px;
-    font-size: 18px;
-    font-weight: 700;
-    cursor: pointer;
-    font-family: inherit;
-    box-shadow: 0 4px 20px rgba(109,40,217,.35);
-    transition: transform .1s, box-shadow .1s;
-  }
-  #btn-start:hover { transform: translateY(-2px); box-shadow: 0 6px 24px rgba(109,40,217,.45); }
-  #btn-start:active { transform: translateY(0); }
-  #start-screen .note { font-size: 12px; color: var(--dim); }
-
-  /* ── Chat screen ── */
-  #chat-screen { flex: 1; display: none; flex-direction: column; }
   header {
     padding: 12px 20px;
     background: linear-gradient(135deg, var(--accent), var(--accent2));
@@ -93,10 +44,10 @@ export const CHAT_HTML = `<!DOCTYPE html>
     color: #fff;
     padding: 4px 8px;
     font-size: 12px;
-    max-width: 150px;
+    max-width: 140px;
     cursor: pointer;
   }
-  #voiceSelect option, #voiceSelect optgroup { background: #4c1d95; color: #fff; }
+  #voiceSelect option { background: #4c1d95; color: #fff; }
   #mute {
     background: transparent;
     border: 1px solid rgba(255,255,255,.35);
@@ -128,11 +79,7 @@ export const CHAT_HTML = `<!DOCTYPE html>
   .audio { align-self: flex-end; background: #5b21b6; color: #fff; border-bottom-right-radius: 4px; font-style: italic; }
   .tool  { align-self: flex-start; font-size: 12px; color: var(--dim); background: #f0ebff; border: 1px solid #c4b5fd; border-radius: 8px; padding: 3px 10px; }
   .error { align-self: flex-start; background: #fff0f0; border: 1px solid #fca5a5; color: #7f1d1d; border-radius: 12px; padding: 10px 14px; }
-  .typing { align-self: flex-start; background: var(--bubble); border: 1px solid var(--border); border-radius: 16px; border-bottom-left-radius: 4px; padding: 11px 15px; }
-  .typing span { display: inline-block; width: 7px; height: 7px; background: var(--dim); border-radius: 50%; margin: 0 2px; animation: bounce 1.2s infinite; }
-  .typing span:nth-child(2) { animation-delay: .2s; }
-  .typing span:nth-child(3) { animation-delay: .4s; }
-  @keyframes bounce { 0%,80%,100%{transform:translateY(0)} 40%{transform:translateY(-6px)} }
+  .sys   { align-self: center; font-size: 12px; color: var(--dim); }
   form {
     display: flex;
     gap: 8px;
@@ -183,85 +130,47 @@ export const CHAT_HTML = `<!DOCTYPE html>
 </style>
 </head>
 <body>
-
-<!-- ── Start screen ── -->
-<div id="start-screen">
-  <div class="logo">&#127760;</div>
-  <h1>Lingua</h1>
-  <p>Tu profesora virtual de idiomas. Aprende ingles con conversaciones naturales, ejercicios personalizados y voz en tiempo real.</p>
-  <div class="badge">
-    <span>&#127908; Voz</span>
-    <span>&#129504; IA adaptativa</span>
-    <span>&#127358; Test de nivel</span>
-    <span>&#128218; Ejercicios</span>
+<header>
+  <span style="font-size:24px">🌐</span>
+  <div style="flex:1">
+    <h1>Lingua <span class="sub">Tu profesora virtual de idiomas</span></h1>
   </div>
-  <button id="btn-start">Comenzar ahora</button>
-  <p class="note">Sofia te hara un test rapido para conocer tu nivel</p>
-</div>
-
-<!-- ── Chat screen ── -->
-<div id="chat-screen">
-  <header>
-    <span style="font-size:22px">&#127760;</span>
-    <div style="flex:1">
-      <h1>Lingua <span class="sub">Sofia, tu profesora de idiomas</span></h1>
-    </div>
-    <div id="controls">
-      <select id="voiceSelect" title="Voz de Sofia"></select>
-      <button id="mute" title="Silenciar voz">&#128266;</button>
-    </div>
-  </header>
-  <div id="log"></div>
-  <form id="f">
-    <input id="box" placeholder="Escribe en ingles o espanol..." autocomplete="off" autofocus>
-    <button type="button" id="mic" title="Grabar voz">&#127908;</button>
-    <button id="send" type="submit">Enviar</button>
-  </form>
-</div>
+  <div id="controls">
+    <select id="voiceSelect" title="Voz de Sofia"></select>
+    <button id="mute" title="Silenciar voz">&#128266;</button>
+  </div>
+</header>
+<div id="log"><div class="sys">Conectando con Sofia...</div></div>
+<form id="f">
+  <input id="box" placeholder="Escribe en ingles o espanol..." autocomplete="off" autofocus>
+  <button type="button" id="mic" title="Grabar voz">&#127908;</button>
+  <button id="send" type="submit">Enviar</button>
+</form>
 
 <script>
 "use strict";
 
 // ── State ─────────────────────────────────────────────────────────────────────
-var log       = null;
-var box       = null;
-var send      = null;
-var mic       = null;
-var muteBtn   = null;
-var voiceSelect = null;
+const log  = document.getElementById("log");
+const box  = document.getElementById("box");
+const send = document.getElementById("send");
+const mic  = document.getElementById("mic");
+const muteBtn     = document.getElementById("mute");
+const voiceSelect = document.getElementById("voiceSelect");
 
+// Stable userId across sessions; fresh sessionId each tab
 if (!localStorage.getItem("lingua_uid")) {
   localStorage.setItem("lingua_uid", "u-" + Math.random().toString(36).slice(2, 10));
 }
-var userId    = localStorage.getItem("lingua_uid");
-var sessionId = Math.random().toString(36).slice(2);
-var CHAT_URL  = window.location.href.split("?")[0].replace(/[/]+$/, "") + "/chat";
+const userId    = localStorage.getItem("lingua_uid");
+const sessionId = Math.random().toString(36).slice(2);
 
-// ── Start screen ──────────────────────────────────────────────────────────────
-document.getElementById("btn-start").addEventListener("click", function() {
-  document.getElementById("start-screen").style.display = "none";
-  var cs = document.getElementById("chat-screen");
-  cs.style.display = "flex";
-
-  // Init DOM refs now that chat screen is visible
-  log       = document.getElementById("log");
-  box       = document.getElementById("box");
-  send      = document.getElementById("send");
-  mic       = document.getElementById("mic");
-  muteBtn   = document.getElementById("mute");
-  voiceSelect = document.getElementById("voiceSelect");
-
-  initVoices();
-  initMic();
-  initForm();
-
-  // Start session
-  ask("__greet__");
-});
+// Chat URL: strip trailing slash(es) from current page URL, append /chat
+const CHAT_URL = window.location.href.split("?")[0].replace(/[/]+$/, "") + "/chat";
 
 // ── UI helpers ────────────────────────────────────────────────────────────────
 function addMsg(cls, text) {
-  var d = document.createElement("div");
+  const d = document.createElement("div");
   d.className = "msg " + cls;
   d.textContent = text;
   log.appendChild(d);
@@ -269,54 +178,43 @@ function addMsg(cls, text) {
   return d;
 }
 
-function addTyping() {
-  var d = document.createElement("div");
-  d.className = "typing";
-  d.id = "typing-indicator";
-  d.innerHTML = "<span></span><span></span><span></span>";
-  log.appendChild(d);
-  log.scrollTop = log.scrollHeight;
-  return d;
-}
-
-function removeTyping() {
-  var t = document.getElementById("typing-indicator");
-  if (t) t.remove();
-}
-
-function setDisabled(val) {
-  if (send) send.disabled = val;
-  if (mic)  mic.disabled  = val;
+function setInputsDisabled(val) {
+  send.disabled = val;
+  mic.disabled  = val;
 }
 
 // ── Speech synthesis ──────────────────────────────────────────────────────────
-var synth    = window.speechSynthesis;
-var voices   = [];
-var muted    = false;
-var spkBuf   = "";
-var spkQueue = Promise.resolve();
+const synth  = window.speechSynthesis;
+let voices   = [];
+let muted    = false;
+let spkBuf   = "";
+let spkQueue = Promise.resolve();
 
+// Supported languages with display label and recognition lang code
 var LANGS = [
   { label: "Ingles",   prefix: "en", recog: "en-US" },
   { label: "Espanol",  prefix: "es", recog: "es-ES" },
   { label: "Frances",  prefix: "fr", recog: "fr-FR" },
   { label: "Italiano", prefix: "it", recog: "it-IT" },
 ];
-var currentLangIdx = 0;
+var currentLangIdx = 0;  // default: Ingles
+
+// voiceMap[langIdx] = array of up to 3 voice objects
 var voiceMap = {};
 
-function buildVoiceMap() {
+function loadVoices() {
   voices = synth.getVoices();
   voiceMap = {};
   LANGS.forEach(function(lang, li) {
     var matches = voices.filter(function(v) { return v.lang.startsWith(lang.prefix); });
     voiceMap[li] = matches.slice(0, 3);
   });
+  rebuildSelect();
 }
 
 function rebuildSelect() {
-  if (!voiceSelect) return;
   voiceSelect.innerHTML = "";
+  // Language group options header + voices
   LANGS.forEach(function(lang, li) {
     var grp = document.createElement("optgroup");
     grp.label = lang.label;
@@ -339,46 +237,46 @@ function rebuildSelect() {
   });
 }
 
-function initVoices() {
-  buildVoiceMap();
-  rebuildSelect();
-  if (synth.onvoiceschanged !== undefined) {
-    synth.onvoiceschanged = function() { buildVoiceMap(); rebuildSelect(); };
-  }
-  voiceSelect.addEventListener("change", function() {
-    var parts = (voiceSelect.value || "0_0").split("_");
-    currentLangIdx = parseInt(parts[0], 10) || 0;
-    if (typeof rec !== "undefined" && rec) rec.lang = LANGS[currentLangIdx].recog;
-  });
-  muteBtn.addEventListener("click", function() {
-    muted = !muted;
-    muteBtn.innerHTML = muted ? "&#128263;" : "&#128266;";
-    if (muted) synth.cancel();
-  });
-}
+loadVoices();
+if (synth.onvoiceschanged !== undefined) synth.onvoiceschanged = loadVoices;
+
+// When user changes language, update mic recognition lang too
+voiceSelect.addEventListener("change", function() {
+  var parts = (voiceSelect.value || "0_0").split("_");
+  currentLangIdx = parseInt(parts[0], 10) || 0;
+  if (typeof rec !== "undefined") rec.lang = LANGS[currentLangIdx].recog;
+});
+
+muteBtn.addEventListener("click", function() {
+  muted = !muted;
+  muteBtn.innerHTML = muted ? "&#128263;" : "&#128266;";
+  if (muted) synth.cancel();
+});
 
 function getVoice() {
-  var parts = (voiceSelect ? voiceSelect.value || "0_0" : "0_0").split("_");
+  var parts = (voiceSelect.value || "0_0").split("_");
   var li = parseInt(parts[0], 10) || 0;
   var vi = parseInt(parts[1], 10) || 0;
   var list = voiceMap[li];
   if (list && list[vi]) return list[vi];
   if (list && list[0]) return list[0];
+  // Fallback: any voice for that language prefix
   var fb = voices.filter(function(v) { return v.lang.startsWith(LANGS[li].prefix); });
   return fb[0] || voices[0] || null;
 }
 
 function cleanText(t) {
-  return t.replace(/[*_#~>]+/g, "").replace(/[ \t\r\n]+/g, " ").trim();
+  // Remove markdown symbols — avoid backtick in character class by using alternation
+  return t.replace(/[*_#~>]+/g, "").replace(/[ \\t\\r\\n]+/g, " ").trim();
 }
 
 function speakChunk(sentence) {
-  var clean = cleanText(sentence);
+  const clean = cleanText(sentence);
   if (!clean) return;
   spkQueue = spkQueue.then(function() {
     return new Promise(function(resolve) {
       if (muted || !synth) { resolve(); return; }
-      var u = new SpeechSynthesisUtterance(clean);
+      const u = new SpeechSynthesisUtterance(clean);
       u.voice = getVoice();
       u.rate  = 0.96;
       u.pitch = 1.05;
@@ -392,7 +290,7 @@ function speakChunk(sentence) {
 function feedSpeech(token) {
   if (muted) return;
   spkBuf += token;
-  var m = spkBuf.match(/^(.*[.!?:])(\s[\s\S]*|$)/);
+  const m = spkBuf.match(/^(.*[.!?:])(\s[\s\S]*|$)/);
   if (m) {
     speakChunk(m[1]);
     spkBuf = spkBuf.slice(m[1].length).replace(/^\s+/, "");
@@ -405,43 +303,39 @@ function flushSpeech() {
 
 // ── Agent communication ───────────────────────────────────────────────────────
 async function ask(message) {
-  setDisabled(true);
+  setInputsDisabled(true);
   synth.cancel();
   spkBuf   = "";
   spkQueue = Promise.resolve();
-
-  var typing = addTyping();
-  var current = null;
+  let current = null;
 
   try {
-    var res = await fetch(CHAT_URL, {
+    const res = await fetch(CHAT_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ message: message, sessionId: sessionId, userId: userId }),
     });
 
-    removeTyping();
-
     if (!res.ok) {
       addMsg("error", "Error HTTP " + res.status + ": " + (await res.text()).slice(0, 120));
-      setDisabled(false);
+      setInputsDisabled(false);
       return;
     }
 
-    var reader  = res.body.getReader();
-    var decoder = new TextDecoder();
-    var buf = "";
+    const reader  = res.body.getReader();
+    const decoder = new TextDecoder();
+    let buf = "";
 
     while (true) {
-      var chunk = await reader.read();
+      const chunk = await reader.read();
       if (chunk.done) break;
       buf += decoder.decode(chunk.value, { stream: true });
-      var lines = buf.split(String.fromCharCode(10));
+      const lines = buf.split("\\n");
       buf = lines.pop();
-      for (var i = 0; i < lines.length; i++) {
-        var line = lines[i].trim();
+      for (let i = 0; i < lines.length; i++) {
+        const line = lines[i].trim();
         if (!line) continue;
-        var m;
+        let m;
         try { m = JSON.parse(line); } catch(e) { continue; }
         if (m.type === "token") {
           if (!current) current = addMsg("agent", "");
@@ -450,55 +344,50 @@ async function ask(message) {
           feedSpeech(m.text);
         } else if (m.type === "tool") {
           current = null;
+          addMsg("tool", "... " + m.name.replace(/_/g, " "));
         } else if (m.type === "done") {
           flushSpeech();
         } else if (m.type === "error") {
           current = null;
-          addMsg("error", m.text);
+          addMsg("error", "Sofia: " + m.text);
         }
       }
     }
     flushSpeech();
 
   } catch (err) {
-    removeTyping();
-    addMsg("error", "Error de conexion: " + err.message);
+    addMsg("error", "Error de red: " + err.message + " (URL: " + CHAT_URL + ")");
   }
 
-  setDisabled(false);
-  if (box) box.focus();
+  setInputsDisabled(false);
+  box.focus();
 }
 
-// ── Form ──────────────────────────────────────────────────────────────────────
-function initForm() {
-  document.getElementById("f").addEventListener("submit", function(e) {
-    e.preventDefault();
-    var text = box.value.trim();
-    if (!text || send.disabled) return;
-    addMsg("user", text);
-    box.value = "";
-    ask(text);
-  });
-}
+// ── Form submit ───────────────────────────────────────────────────────────────
+document.getElementById("f").addEventListener("submit", function(e) {
+  e.preventDefault();
+  const text = box.value.trim();
+  if (!text || send.disabled) return;
+  addMsg("user", text);
+  box.value = "";
+  ask(text);
+});
 
 // ── Microphone ────────────────────────────────────────────────────────────────
-var rec = null;
+const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
 
-function initMic() {
-  var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-  if (!SR) {
-    mic.disabled = true;
-    mic.title = "Usa Chrome para activar el microfono";
-    mic.style.opacity = "0.35";
-    return;
-  }
-  rec = new SR();
+if (!SR) {
+  mic.disabled = true;
+  mic.title = "Tu navegador no soporta grabacion de voz (usa Chrome)";
+  mic.style.opacity = "0.35";
+} else {
+  var rec = new SR();
   rec.lang = LANGS[currentLangIdx].recog;
   rec.interimResults = true;
   rec.maxAlternatives = 1;
 
-  var recording = false;
-  var liveDiv   = null;
+  let recording = false;
+  let liveDiv   = null;
 
   mic.addEventListener("click", function() {
     if (recording) { rec.stop(); return; }
@@ -514,19 +403,19 @@ function initMic() {
   };
 
   rec.onresult = function(e) {
-    var interim = "", final = "";
-    for (var i = 0; i < e.results.length; i++) {
+    let interim = "", final = "";
+    for (let i = 0; i < e.results.length; i++) {
       if (e.results[i].isFinal) final += e.results[i][0].transcript;
       else interim += e.results[i][0].transcript;
     }
-    if (liveDiv) liveDiv.textContent = "&#127908; " + (final || interim);
+    if (liveDiv) liveDiv.textContent = "🎤 " + (final || interim);
   };
 
   rec.onend = function() {
     recording = false;
     mic.classList.remove("on");
     mic.innerHTML = "&#127908;";
-    var transcript = liveDiv ? liveDiv.textContent.replace("&#127908; ", "").trim() : "";
+    const transcript = liveDiv ? liveDiv.textContent.replace("🎤 ", "").trim() : "";
     liveDiv = null;
     if (!transcript) return;
     ask("[audio: " + transcript + "]");
@@ -542,6 +431,14 @@ function initMic() {
     }
   };
 }
+
+// ── Greet on load ─────────────────────────────────────────────────────────────
+window.addEventListener("load", async function() {
+  await ask("__greet__");
+  const sys = document.querySelector(".sys");
+  if (sys) sys.remove();
+  box.focus();
+});
 </script>
 </body>
 </html>`;
