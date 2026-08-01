@@ -3,3 +3,6 @@
 node_modules/
 *.zip
 CLAUDE.md
+.agents/
+skills-lock.json
+agent/
