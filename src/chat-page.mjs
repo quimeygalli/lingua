@@ -436,7 +436,7 @@ async function ask(message) {
       var chunk = await reader.read();
       if (chunk.done) break;
       buf += decoder.decode(chunk.value, { stream: true });
-      var lines = buf.split("\n");
+      var lines = buf.split(String.fromCharCode(10));
       buf = lines.pop();
       for (var i = 0; i < lines.length; i++) {
         var line = lines[i].trim();
