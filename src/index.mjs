@@ -1,41 +1,51 @@
-// ------------------------------------------------------------
-// Plumbing: serves the chat page and streams your agent's
-// answers to the browser. You won't need to change this file —
-// your agent lives in agent.mjs.
-// ------------------------------------------------------------
 import { CHAT_HTML } from "./chat-page.mjs";
 import { answerWith } from "./agent.mjs";
 
 export const handler = awslambda.streamifyResponse(
-  async (event, responseStream, context) => {
-    // GET / → the chat page
-    if (event.httpMethod === "GET") {
-      responseStream = awslambda.HttpResponseStream.from(responseStream, {
+  async (event, responseStream) => {
+    const method = event.httpMethod;
+    const path = event.path || event.rawPath || "/";
+
+    // GET / → chat page
+    if (method === "GET" && (path === "/" || path === "")) {
+      const stream = awslambda.HttpResponseStream.from(responseStream, {
         statusCode: 200,
         headers: { "Content-Type": "text/html; charset=utf-8" },
       });
-      responseStream.write(CHAT_HTML);
-      responseStream.end();
+      stream.write(CHAT_HTML);
+      stream.end();
       return;
     }
 
-    // POST /chat → stream the agent's answer as NDJSON
-    responseStream = awslambda.HttpResponseStream.from(responseStream, {
-      statusCode: 200,
-      headers: { "Content-Type": "application/x-ndjson", "Transfer-Encoding": "chunked" },
-    });
-    const send = (obj) => responseStream.write(JSON.stringify(obj) + "\n");
-
-    try {
-      const { message, sessionId, userId } = JSON.parse(event.body ?? "{}");
-      for await (const chunk of answerWith(message ?? "Hello!", sessionId ?? "no-session", userId ?? "anonymous")) {
-        send(chunk);
+    // POST /chat → stream agent answer as NDJSON
+    if (method === "POST" && (path === "/chat" || path === "chat")) {
+      const stream = awslambda.HttpResponseStream.from(responseStream, {
+        statusCode: 200,
+        headers: { "Content-Type": "application/x-ndjson", "Transfer-Encoding": "chunked" },
+      });
+      const send = (obj) => stream.write(JSON.stringify(obj) + "\n");
+      try {
+        const { message, sessionId, userId } = JSON.parse(event.body ?? "{}");
+        for await (const chunk of answerWith(
+          message ?? "Hello!",
+          sessionId ?? "no-session",
+          userId ?? "anonymous"
+        )) {
+          send(chunk);
+        }
+        send({ type: "done" });
+      } catch (err) {
+        send({ type: "error", text: err.name + ": " + err.message });
       }
-      send({ type: "done" });
-    } catch (err) {
-      // If anything breaks, tell the chat window instead of failing silently
-      send({ type: "error", text: `${err.name}: ${err.message}` });
+      stream.end();
+      return;
     }
-    responseStream.end();
+
+    const stream = awslambda.HttpResponseStream.from(responseStream, {
+      statusCode: 404,
+      headers: { "Content-Type": "application/json" },
+    });
+    stream.write(JSON.stringify({ error: "Not found" }));
+    stream.end();
   }
 );
