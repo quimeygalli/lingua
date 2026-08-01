@@ -192,12 +192,12 @@ let spkQueue = Promise.resolve();
 
 // Supported languages with display label and recognition lang code
 var LANGS = [
-  { label: "Ingles",   prefix: "en", recog: "en-US" },
   { label: "Espanol",  prefix: "es", recog: "es-ES" },
+  { label: "Ingles",   prefix: "en", recog: "en-US" },
   { label: "Frances",  prefix: "fr", recog: "fr-FR" },
   { label: "Italiano", prefix: "it", recog: "it-IT" },
 ];
-var currentLangIdx = 0;  // default: Ingles
+var currentLangIdx = 0;  // default: Espanol
 
 // voiceMap[langIdx] = array of up to 3 voice objects
 var voiceMap = {};
