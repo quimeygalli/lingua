@@ -134,11 +134,15 @@ function makeStudentTools(userId) {
     }),
     callback: async ({ errores, palabrasNuevas, nivelActualizado, puntuacion, duracionMin }) => {
       const prev = (await loadProfile(userId)) ?? {};
+      const nombreEntry = palabrasNuevas.find(p => p.startsWith("nombre:"));
+      const nombreGuardado = nombreEntry ? nombreEntry.replace("nombre:", "").trim() : null;
+      const vocabSinNombre = palabrasNuevas.filter(p => !p.startsWith("nombre:"));
       const erroresMerged = [...new Set([...(prev.erroresFrecuentes ?? []), ...errores])].slice(-20);
-      const vocabMerged = [...new Set([...(prev.vocabularioAprendido ?? []), ...palabrasNuevas])].slice(-200);
+      const vocabMerged = [...new Set([...(prev.vocabularioAprendido ?? []), ...vocabSinNombre])].slice(-200);
       const scoresMerged = [...(prev.puntuacionesAnteriores ?? []), puntuacion].slice(-10);
       await saveProfile(userId, {
         ...prev,
+        ...(nombreGuardado ? { nombre: nombreGuardado } : {}),
         nivel: nivelActualizado,
         erroresFrecuentes: erroresMerged,
         vocabularioAprendido: vocabMerged,
@@ -254,16 +258,17 @@ const GREET_PROMPT =
 
   "Si primeraVez es true (nunca ha usado la app): " +
   "Saludalo brevemente en espanol (1-2 oraciones) y dile que le haras un test rapido de texto para conocer su nivel real. " +
+  "Antes de empezar el test, preguntale su nombre en espanol (solo eso, una oracion). Espera su respuesta. " +
   "Luego haz exactamente 5 preguntas EN INGLES, UNA POR VEZ — espera su respuesta antes de continuar. " +
   "Antes de cada pregunta escribe en espanol: 'Pregunta X de 5:' (donde X es el numero actual). " +
-  "P1: 'What is your name and where are you from?' (nivel A1) " +
+  "P1: 'Nice to meet you! Where are you from?' (nivel A1) " +
   "P2: 'Describe your daily routine using at least 3 sentences.' (nivel A2) " +
   "P3: 'Tell me about something interesting you did last year.' (nivel B1) " +
   "P4: 'What would you do if you could live in any country? Why?' (nivel B2) " +
   "P5: 'Explain the difference between \"although\" and \"however\" and use each in a sentence.' (nivel C1) " +
   "Al recibir las 5 respuestas, analiza gramatica, vocabulario y coherencia. " +
-  "Determina el nivel (A1/A2/B1/B2/C1) y explicale el resultado en espanol con entusiasmo. " +
-  "Usa save_progress() para guardar el nivel real determinado por el test. " +
+  "Determina el nivel (A1/A2/B1/B2/C1) y explicale el resultado en espanol con entusiasmo, llamandolo por su nombre. " +
+  "Usa save_progress() para guardar el nivel real. En el campo 'palabrasNuevas' incluye el nombre del estudiante con el prefijo 'nombre:' (ej: 'nombre:Maria') para recordarlo. " +
 
   "Si primeraVez es false (ya tiene historial): " +
   "Saludalo por nombre si esta disponible, menciona su nivel y racha de sesiones en espanol, " +
