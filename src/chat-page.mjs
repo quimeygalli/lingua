@@ -190,22 +190,62 @@ let muted    = false;
 let spkBuf   = "";
 let spkQueue = Promise.resolve();
 
+// Supported languages with display label and recognition lang code
+var LANGS = [
+  { label: "Ingles",   prefix: "en", recog: "en-US" },
+  { label: "Espanol",  prefix: "es", recog: "es-ES" },
+  { label: "Frances",  prefix: "fr", recog: "fr-FR" },
+  { label: "Italiano", prefix: "it", recog: "it-IT" },
+];
+var currentLangIdx = 0;  // default: Ingles
+
+// voiceMap[langIdx] = array of up to 3 voice objects
+var voiceMap = {};
+
 function loadVoices() {
   voices = synth.getVoices();
-  const en   = voices.filter(function(v) { return v.lang.startsWith("en"); });
-  const list = en.length ? en : voices;
-  voiceSelect.innerHTML = "";
-  list.forEach(function(v, i) {
-    const o = document.createElement("option");
-    o.value = i;
-    o.textContent = v.name.replace("Google ", "").substring(0, 22);
-    if (v.lang === "en-US") o.selected = true;
-    voiceSelect.appendChild(o);
+  voiceMap = {};
+  LANGS.forEach(function(lang, li) {
+    var matches = voices.filter(function(v) { return v.lang.startsWith(lang.prefix); });
+    voiceMap[li] = matches.slice(0, 3);
   });
-  if (!voiceSelect.value && list.length) voiceSelect.options[0].selected = true;
+  rebuildSelect();
 }
+
+function rebuildSelect() {
+  voiceSelect.innerHTML = "";
+  // Language group options header + voices
+  LANGS.forEach(function(lang, li) {
+    var grp = document.createElement("optgroup");
+    grp.label = lang.label;
+    var list = voiceMap[li] || [];
+    if (list.length === 0) {
+      var o = document.createElement("option");
+      o.value = li + "_0";
+      o.textContent = lang.label + " (sistema)";
+      grp.appendChild(o);
+    } else {
+      list.forEach(function(v, vi) {
+        var o = document.createElement("option");
+        o.value = li + "_" + vi;
+        o.textContent = v.name.replace("Google ", "").substring(0, 24);
+        if (li === 0 && vi === 0) o.selected = true;
+        grp.appendChild(o);
+      });
+    }
+    voiceSelect.appendChild(grp);
+  });
+}
+
 loadVoices();
 if (synth.onvoiceschanged !== undefined) synth.onvoiceschanged = loadVoices;
+
+// When user changes language, update mic recognition lang too
+voiceSelect.addEventListener("change", function() {
+  var parts = (voiceSelect.value || "0_0").split("_");
+  currentLangIdx = parseInt(parts[0], 10) || 0;
+  if (typeof rec !== "undefined") rec.lang = LANGS[currentLangIdx].recog;
+});
 
 muteBtn.addEventListener("click", function() {
   muted = !muted;
@@ -214,9 +254,15 @@ muteBtn.addEventListener("click", function() {
 });
 
 function getVoice() {
-  const en   = voices.filter(function(v) { return v.lang.startsWith("en"); });
-  const list = en.length ? en : voices;
-  return list[parseInt(voiceSelect.value, 10)] || list[0] || null;
+  var parts = (voiceSelect.value || "0_0").split("_");
+  var li = parseInt(parts[0], 10) || 0;
+  var vi = parseInt(parts[1], 10) || 0;
+  var list = voiceMap[li];
+  if (list && list[vi]) return list[vi];
+  if (list && list[0]) return list[0];
+  // Fallback: any voice for that language prefix
+  var fb = voices.filter(function(v) { return v.lang.startsWith(LANGS[li].prefix); });
+  return fb[0] || voices[0] || null;
 }
 
 function cleanText(t) {
@@ -335,8 +381,8 @@ if (!SR) {
   mic.title = "Tu navegador no soporta grabacion de voz (usa Chrome)";
   mic.style.opacity = "0.35";
 } else {
-  const rec = new SR();
-  rec.lang = "en-US";
+  var rec = new SR();
+  rec.lang = LANGS[currentLangIdx].recog;
   rec.interimResults = true;
   rec.maxAlternatives = 1;
 
