@@ -85,7 +85,7 @@ function makeStudentTools(userId) {
         const defaults = {
           nombre: "Estudiante",
           idiomaObjetivo: "Ingles",
-          nivel: "A2",
+          nivel: null,
           objetivos: ["Conversacion cotidiana"],
           sesionesTotales: 0,
           ultimaSesion: null,
@@ -96,7 +96,8 @@ function makeStudentTools(userId) {
       const diasSinPracticar = profile.ultimaSesion
         ? Math.floor((Date.now() - new Date(profile.ultimaSesion).getTime()) / 86400000)
         : 0;
-      return JSON.stringify({ ...profile, diasSinPracticar });
+      const primeraVez = !profile.nivel || profile.sesionesTotales === 0;
+      return JSON.stringify({ ...profile, diasSinPracticar, primeraVez });
     },
   });
 
@@ -248,11 +249,24 @@ const schedulePractice = tool({
 // ---------- Prompts ----------
 
 const GREET_PROMPT =
-  "Eres Sofia, una profesora virtual de idiomas amable, paciente y motivadora. SIEMPRE hablas en espanol. " +
-  "Al iniciar: usa get_user_profile() y get_learning_history() para conocer al estudiante. " +
-  "Saludalo con calidez EN ESPANOL, muestra un resumen breve de su progreso " +
-  "(nivel, sesiones totales, errores frecuentes si los hay) " +
-  "y preguntale que le gustaria practicar hoy. Se entusiasta y breve (3-4 oraciones).";
+  "Eres Sofia, profesora virtual de idiomas. SIEMPRE hablas en espanol. " +
+  "Primero usa get_user_profile() para saber si el estudiante es nuevo. " +
+
+  "Si primeraVez es true (nunca ha usado la app): " +
+  "Saludalo brevemente en espanol (1-2 oraciones) y dile que le haras un test rapido de texto para conocer su nivel real. " +
+  "Luego haz exactamente 5 preguntas EN INGLES, UNA POR VEZ — espera su respuesta antes de continuar: " +
+  "P1: 'What is your name and where are you from?' (nivel A1) " +
+  "P2: 'Describe your daily routine using at least 3 sentences.' (nivel A2) " +
+  "P3: 'Tell me about something interesting you did last year.' (nivel B1) " +
+  "P4: 'What would you do if you could live in any country? Why?' (nivel B2) " +
+  "P5: 'Explain the difference between \"although\" and \"however\" and use each in a sentence.' (nivel C1) " +
+  "Al recibir las 5 respuestas, analiza gramatica, vocabulario y coherencia. " +
+  "Determina el nivel (A1/A2/B1/B2/C1) y explicale el resultado en espanol con entusiasmo. " +
+  "Usa save_progress() para guardar el nivel real determinado por el test. " +
+
+  "Si primeraVez es false (ya tiene historial): " +
+  "Saludalo por nombre si esta disponible, menciona su nivel y racha de sesiones en espanol, " +
+  "y preguntale que quiere practicar hoy. Maximo 3 oraciones.";
 
 const SYSTEM_PROMPT =
   "Eres Sofia, una profesora virtual de idiomas experta, paciente y motivadora. " +
