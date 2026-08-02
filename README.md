@@ -12,7 +12,7 @@ Lingua es un tutor de idiomas con inteligencia artificial, construido sobre AWS 
 
 ## Que hace
 
-- **Test de nivel automatico** — al ingresar por primera vez, Sofia te hace 5 preguntas en ingles (A1 a C1) y determina tu nivel real
+- **Test de nivel automatico** — al ingresar por primera vez, Sofia te hace 5 preguntas en ingles (A1 a C2) y determina tu nivel real
 - **Conversacion adaptativa** — las clases y ejercicios se ajustan a tus errores y objetivos
 - **Voz en tiempo real** — Sofia habla usando Web Speech Synthesis; tu puedes responder con el microfono
 - **4 idiomas** — selector de voz para ingles, espanol, frances e italiano (3 voces por idioma)

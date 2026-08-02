@@ -14,7 +14,7 @@ Resources:
       Handler: index.handler
       Runtime: nodejs22.x
       Architectures: [arm64]
-      MemorySize: 256
+      MemorySize: 512
       Timeout: 120
       CodeUri: src/
       Environment:
@@ -72,9 +72,73 @@ Resources:
         TimeoutInMillis: 29000
         Uri: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2021-11-15/functions/${AgentFunction.Arn}/response-streaming-invocations
 
+  # /admin resource
+  AdminResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      RestApiId: !Ref Api
+      ParentId: !GetAtt Api.RootResourceId
+      PathPart: admin
+
+  # GET /admin — serves the admin page
+  AdminMethod:
+    Type: AWS::ApiGateway::Method
+    # checkov:skip=CKV_AWS_59: Password-protected admin UI in a short-lived workshop account.
+    Properties:
+      RestApiId: !Ref Api
+      ResourceId: !Ref AdminResource
+      HttpMethod: GET
+      AuthorizationType: NONE
+      Integration:
+        Type: AWS_PROXY
+        IntegrationHttpMethod: POST
+        ResponseTransferMode: STREAM
+        TimeoutInMillis: 29000
+        Uri: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2021-11-15/functions/${AgentFunction.Arn}/response-streaming-invocations
+
+  # /admin/stock resource
+  AdminStockResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      RestApiId: !Ref Api
+      ParentId: !Ref AdminResource
+      PathPart: stock
+
+  # GET /admin/stock — list all products + stock levels
+  AdminStockGetMethod:
+    Type: AWS::ApiGateway::Method
+    # checkov:skip=CKV_AWS_59: Admin UI in a short-lived workshop account.
+    Properties:
+      RestApiId: !Ref Api
+      ResourceId: !Ref AdminStockResource
+      HttpMethod: GET
+      AuthorizationType: NONE
+      Integration:
+        Type: AWS_PROXY
+        IntegrationHttpMethod: POST
+        ResponseTransferMode: STREAM
+        TimeoutInMillis: 29000
+        Uri: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2021-11-15/functions/${AgentFunction.Arn}/response-streaming-invocations
+
+  # POST /admin/stock — update a product's stock
+  AdminStockPostMethod:
+    Type: AWS::ApiGateway::Method
+    # checkov:skip=CKV_AWS_59: Admin UI in a short-lived workshop account.
+    Properties:
+      RestApiId: !Ref Api
+      ResourceId: !Ref AdminStockResource
+      HttpMethod: POST
+      AuthorizationType: NONE
+      Integration:
+        Type: AWS_PROXY
+        IntegrationHttpMethod: POST
+        ResponseTransferMode: STREAM
+        TimeoutInMillis: 29000
+        Uri: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2021-11-15/functions/${AgentFunction.Arn}/response-streaming-invocations
+
   Deployment:
     Type: AWS::ApiGateway::Deployment
-    DependsOn: [ChatMethod, RootMethod]
+    DependsOn: [ChatMethod, RootMethod, AdminMethod, AdminStockGetMethod, AdminStockPostMethod]
     Properties:
       RestApiId: !Ref Api
 
